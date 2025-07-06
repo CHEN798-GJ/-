@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>刺绣工资管理系统</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --bg-color: #ffffff;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --border-color: #444444;
+            --light-color: #2d2d2d;
+            --dark-color: #ffffff;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color) !important;
+        }
+        
+        .card {
+            background-color: var(--bg-color);
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+        
+        .card-header {
+            background-color: var(--light-color);
+            border-bottom-color: var(--border-color);
+        }
+        
+        .table {
+            --bs-table-bg: var(--bg-color);
+            --bs-table-color: var(--text-color);
+            --bs-table-border-color: var(--border-color);
+        }
+        
+        .form-control, .form-select {
+            background-color: var(--bg-color);
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: var(--bg-color);
+            border-color: var(--primary-color);
+            color: var(--text-color);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        .modal-content {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        
+        .modal-header {
+            border-bottom-color: var(--border-color);
+        }
+        
+        .modal-footer {
+            border-top-color: var(--border-color);
+        }
+        
+        .btn-close {
+            filter: var(--bs-btn-close-white-filter, none);
+        }
+        
+        [data-theme="dark"] .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+        
+        .sidebar {
+            background-color: var(--light-color);
+            border-right: 1px solid var(--border-color);
+            min-height: calc(100vh - 56px);
+        }
+        
+        .nav-link {
+            color: var(--text-color);
+        }
+        
+        .nav-link:hover {
+            background-color: var(--border-color);
+        }
+        
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.3s;
+        }
+        
+        .theme-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .content-area {
+            padding: 20px;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stats-card h3 {
+            margin: 0;
+            font-size: 2rem;
+        }
+        
+        .stats-card p {
+            margin: 5px 0 0 0;
+            opacity: 0.9;
+        }
+        
+        .table-responsive {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .btn-group-sm .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .status-inactive {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .form-floating {
+            position: relative;
+        }
+        
+        .form-floating > .form-control,
+        .form-floating > .form-select {
+            height: calc(3.5rem + 2px);
+            padding: 1rem 0.75rem;
+        }
+        
+        .form-floating > label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 1rem 0.75rem;
+            overflow: hidden;
+            text-align: start;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            pointer-events: none;
+            border: 1px solid transparent;
+            transform-origin: 0 0;
+            transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
+        }
+        
+        .summary-table {
+            font-size: 0.9rem;
+        }
+        
+        .summary-table th {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            vertical-align: middle;
+        }
+        
+        .summary-table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        
+        .total-row {
+            background-color: var(--warning-color);
+            font-weight: bold;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        .alert {
+            border-radius: 8px;
+        }
+        
+        .page-title {
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        select, option, .form-select {
+            text-decoration: none !important;
+            border-bottom: none !important;
+        }
+        
+        .form-select {
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            box-sizing: border-box;
+        }
+        
+        .form-floating .form-select,
+        .form-floating > .form-select,
+        .form-floating select.form-select {
+            height: 3.5rem !important;
+            line-height: 2.2rem !important;
+            padding-top: 1rem !important;
+            padding-bottom: 1rem !important;
+            font-size: 1rem !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-cut me-2"></i>刺绣工资管理系统
+            </a>
+            <div class="navbar-nav ms-auto">
+                <button class="theme-toggle" onclick="toggleTheme()" title="切换主题">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 侧边栏 -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <div class="nav flex-column nav-pills mt-3" id="sidebarNav">
+                    <a class="nav-link active" href="#" data-page="dashboard">
+                        <i class="fas fa-tachometer-alt me-2"></i>工作台
+                    </a>
+                    <a class="nav-link" href="#" data-page="employees">
+                        <i class="fas fa-users me-2"></i>员工管理
+                    </a>
+                    <a class="nav-link" href="#" data-page="patterns">
+                        <i class="fas fa-palette me-2"></i>花型管理
+                    </a>
+                    <a class="nav-link" href="#" data-page="records">
+                        <i class="fas fa-clipboard-list me-2"></i>工资记录
+                    </a>
+                    <a class="nav-link" href="#" data-page="reports">
+                        <i class="fas fa-chart-bar me-2"></i>统计报表
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 主内容区 -->
+            <div class="col-md-9 col-lg-10 content-area">
+                <div id="pageContent">
+                    <!-- 页面内容将在这里动态加载 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 通用模态框 -->
+    <div class="modal fade" id="commonModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="commonModalTitle">标题</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="commonModalBody">
+                    <!-- 模态框内容 -->
+                </div>
+                <div class="modal-footer" id="commonModalFooter">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="commonModalConfirm">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 确认删除模态框 -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">确认删除</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>确定要删除这条记录吗？此操作不可恢复。</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加员工模态框 -->
+    <div class="modal fade" id="addEmployeeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">添加员工</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="addEmployeeName" placeholder="员工姓名">
+                        <label>员工姓名</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addEmployee()">添加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 编辑员工模态框 -->
+    <div class="modal fade" id="editEmployeeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">编辑员工</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editEmployeeId">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="editEmployeeName" placeholder="员工姓名">
+                        <label>员工姓名</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="editEmployeeStatus">
+                            <option value="active">在职</option>
+                            <option value="inactive">离职</option>
+                        </select>
+                        <label>状态</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="updateEmployee()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加花型模态框 -->
+    <div class="modal fade" id="addPatternModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">添加花型</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="addPatternName" placeholder="花型名称">
+                        <label>花型名称</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="number" class="form-control" id="addPatternPrice" placeholder="单价" step="0.01" min="0">
+                        <label>单价(元)</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addPattern()">添加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 编辑花型模态框 -->
+    <div class="modal fade" id="editPatternModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">编辑花型</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editPatternId">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="editPatternName" placeholder="花型名称">
+                        <label>花型名称</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="number" class="form-control" id="editPatternPrice" placeholder="单价" step="0.01" min="0">
+                        <label>单价(元)</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="updatePattern()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加工资记录模态框 -->
+    <div class="modal fade" id="addRecordModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">添加工资记录</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <select class="form-select" id="addRecordEmployee">
+                                    <option value="">请选择员工</option>
+                                </select>
+                                <label>员工</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <select class="form-select" id="addRecordPattern">
+                                    <option value="">请选择花型</option>
+                                </select>
+                                <label>花型</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="date" class="form-control" id="addRecordDate">
+                                <label>记录日期</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="addRecordCount" placeholder="针数" min="1">
+                                <label>针数</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="addRecordSpecial" placeholder="特殊说明">
+                                <label>特殊说明</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="addRecordNote" placeholder="备注">
+                                <label>备注</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="addRecord()">添加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 编辑工资记录模态框 -->
+    <div class="modal fade" id="editRecordModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">编辑工资记录</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted">编辑功能正在开发中...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 导入Excel模态框 -->
+    <div class="modal fade" id="importModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">导入Excel数据</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="importFile" class="form-label">选择Excel文件</label>
+                        <input type="file" class="form-control" id="importFile" accept=".xlsx,.xls">
+                    </div>
+                    <div class="alert alert-info">
+                        <h6>Excel文件格式要求：</h6>
+                        <ul class="mb-0">
+                            <li>必须包含列：员工姓名、花型、针数、记录日期</li>
+                            <li>可选列：特殊说明、备注</li>
+                            <li>日期格式：YYYY-MM-DD</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="importExcel()">导入</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript 依赖 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap5.min.js"></script>
+    
+    <script>
+        // 全局变量
+        let currentPage = 'dashboard';
+        let currentTable = null;
+        let employees = [];
+        let patterns = [];
+        let records = [];
+        
+        // 页面模板
+        const pageTemplates = {
+            dashboard: `
+                <div class="page-title">
+                    <h2><i class="fas fa-tachometer-alt me-2"></i>工作台</h2>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <h3 id="employeeCount">0</h3>
+                            <p>员工总数</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <h3 id="patternCount">0</h3>
+                            <p>花型总数</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <h3 id="recordCount">0</h3>
+                            <p>今日记录</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <h3 id="todayWage">¥0.00</h3>
+                            <p>今日工资</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">今日工资记录</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped" id="todayRecordsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>员工</th>
+                                                <th>花型</th>
+                                                <th>针数</th>
+                                                <th>工资</th>
+                                                <th>录入时间</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            
+            employees: `
+                <div class="page-title">
+                    <h2><i class="fas fa-users me-2"></i>员工管理</h2>
+                </div>
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">员工列表</h5>
+                        <button class="btn btn-primary" onclick="showAddEmployeeModal()">
+                            <i class="fas fa-plus me-2"></i>添加员工
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="employeesTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>姓名</th>
+                                        <th>状态</th>
+                                        <th>创建时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `,
+            
+            patterns: `
+                <div class="page-title">
+                    <h2><i class="fas fa-palette me-2"></i>花型管理</h2>
+                </div>
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">花型列表</h5>
+                        <button class="btn btn-primary" onclick="showAddPatternModal()">
+                            <i class="fas fa-plus me-2"></i>添加花型
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="patternsTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>花型名称</th>
+                                        <th>单价(元)</th>
+                                        <th>创建时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `,
+            
+            records: `
+                <div class="page-title">
+                    <h2><i class="fas fa-clipboard-list me-2"></i>工资记录</h2>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">筛选条件</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <select class="form-select" id="filterEmployee">
+                                        <option value="">全部员工</option>
+                                    </select>
+                                    <label>员工</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <select class="form-select" id="filterPattern">
+                                        <option value="">全部花型</option>
+                                    </select>
+                                    <label>花型</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-floating">
+                                    <input type="date" class="form-control" id="filterStartDate">
+                                    <label>开始日期</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-floating">
+                                    <input type="date" class="form-control" id="filterEndDate">
+                                    <label>结束日期</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-primary w-100 h-100" onclick="filterRecords()">
+                                    <i class="fas fa-search me-2"></i>筛选
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">工资记录</h5>
+                        <div>
+                            <button class="btn btn-success me-2" onclick="showImportModal()">
+                                <i class="fas fa-upload me-2"></i>导入Excel
+                            </button>
+                            <button class="btn btn-primary" onclick="showAddRecordModal()">
+                                <i class="fas fa-plus me-2"></i>添加记录
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="recordsTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>员工</th>
+                                        <th>花型</th>
+                                        <th>记录日期</th>
+                                        <th>针数</th>
+                                        <th>工资</th>
+                                        <th>特殊说明</th>
+                                        <th>备注</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `,
+            
+            reports: `
+                <div class="page-title">
+                    <h2><i class="fas fa-chart-bar me-2"></i>统计报表</h2>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">日工资汇总</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <div class="form-floating">
+                                            <input type="date" class="form-control" id="dailyReportDate">
+                                            <label>选择日期</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <button class="btn btn-primary w-100 h-100" onclick="generateDailyReport()">
+                                            <i class="fas fa-search me-2"></i>查询
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="dailyReportContent" class="mt-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">月工资汇总</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <div class="form-floating">
+                                            <select class="form-select" id="monthlyReportYear">
+                                                <option value="2024">2024</option>
+                                                <option value="2025" selected>2025</option>
+                                                <option value="2026">2026</option>
+                                            </select>
+                                            <label>年份</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="form-floating">
+                                            <select class="form-select" id="monthlyReportMonth">
+                                                <option value="1">1月</option>
+                                                <option value="2">2月</option>
+                                                <option value="3">3月</option>
+                                                <option value="4">4月</option>
+                                                <option value="5">5月</option>
+                                                <option value="6">6月</option>
+                                                <option value="7" selected>7月</option>
+                                                <option value="8">8月</option>
+                                                <option value="9">9月</option>
+                                                <option value="10">10月</option>
+                                                <option value="11">11月</option>
+                                                <option value="12">12月</option>
+                                            </select>
+                                            <label>月份</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <button class="btn btn-primary w-100 h-100" onclick="generateMonthlyReport()">
+                                            <i class="fas fa-search me-2"></i>查询
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <button class="btn btn-success w-100" onclick="exportMonthlyExcel()" disabled id="exportBtn">
+                                            <i class="fas fa-download me-2"></i>导出Excel
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="monthlyReportContent" class="mt-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+        
+        // 初始化应用
+        $(document).ready(function() {
+            // 初始化主题
+            initTheme();
+            
+            // 绑定侧边栏事件
+            $('#sidebarNav .nav-link').click(function(e) {
+                e.preventDefault();
+                const page = $(this).data('page');
+                switchPage(page);
+            });
+            
+            // 加载初始页面
+            switchPage('dashboard');
+            
+            // 设置今日日期
+            const today = new Date().toISOString().split('T')[0];
+            $('#dailyReportDate').val(today);
+            $('#filterStartDate').val(today);
+            $('#filterEndDate').val(today);
+        });
+        
+        // 主题切换
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+        
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+        
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('themeIcon');
+            if (theme === 'dark') {
+                icon.className = 'fas fa-sun';
+            } else {
+                icon.className = 'fas fa-moon';
+            }
+        }
+        
+        // 页面切换
+        function switchPage(page) {
+            if (currentPage === page) return;
+            
+            // 更新侧边栏状态
+            $('#sidebarNav .nav-link').removeClass('active');
+            $(`#sidebarNav .nav-link[data-page="${page}"]`).addClass('active');
+            
+            // 销毁当前表格
+            if (currentTable) {
+                currentTable.destroy();
+                currentTable = null;
+            }
+            
+            // 加载页面内容
+            $('#pageContent').html(pageTemplates[page]);
+            currentPage = page;
+            
+            // 初始化页面
+            switch(page) {
+                case 'dashboard':
+                    loadDashboard();
+                    break;
+                case 'employees':
+                    loadEmployees();
+                    break;
+                case 'patterns':
+                    loadPatterns();
+                    break;
+                case 'records':
+                    loadRecords();
+                    break;
+                case 'reports':
+                    loadReports();
+                    break;
+            }
+        }
+        
+        // 显示消息提示
+        function showMessage(message, type = 'info') {
+            const alertClass = type === 'error' ? 'alert-danger' : 
+                              type === 'success' ? 'alert-success' : 
+                              type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            const alert = $(`
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `);
+            
+            // 将消息添加到页面顶部
+            $('#pageContent').prepend(alert);
+            
+            // 3秒后自动关闭
+            setTimeout(() => {
+                alert.alert('close');
+            }, 3000);
+        }
+        
+        // 显示加载状态
+        function showLoading(container) {
+            const loading = $(`
+                <div class="loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">加载中...</p>
+                </div>
+            `);
+            $(container).html(loading);
+        }
+        
+        // API调用封装
+        async function callAPI(method, ...args) {
+            try {
+                const result = await window.pywebview.api[method](...args);
+                return result;
+            } catch (error) {
+                console.error(`API调用失败: ${method}`, error);
+                showMessage(`操作失败: ${error.message}`, 'error');
+                return { success: false, message: error.message };
+            }
+        }
+        
+        // ==================== 工作台页面 ====================
+        
+        async function loadDashboard() {
+            try {
+                // 加载统计数据
+                const [employeesRes, patternsRes, recordsRes] = await Promise.all([
+                    callAPI('get_employees'),
+                    callAPI('get_patterns'),
+                    callAPI('get_records')
+                ]);
+                
+                if (employeesRes.success) {
+                    $('#employeeCount').text(employeesRes.data.length);
+                }
+                
+                if (patternsRes.success) {
+                    $('#patternCount').text(patternsRes.data.length);
+                }
+                
+                if (recordsRes.success) {
+                    const today = new Date().toISOString().split('T')[0];
+                    const todayRecords = recordsRes.data.filter(record => record.record_date === today);
+                    
+                    $('#recordCount').text(todayRecords.length);
+                    
+                    const todayWage = todayRecords.reduce((sum, record) => sum + record.total, 0);
+                    $('#todayWage').text(`¥${todayWage.toFixed(2)}`);
+                }
+            } catch (error) {
+                console.error('加载工作台数据失败', error);
+                showMessage('加载工作台数据失败', 'error');
+            }
+        }
+        
+        // ==================== 员工管理页面 ====================
+        
+        async function loadEmployees() {
+            try {
+                showLoading('#employeesTable tbody');
+                const result = await callAPI('get_employees');
+                
+                if (result.success) {
+                    const employees = result.data;
+                    let html = '';
+                    
+                    employees.forEach(emp => {
+                        const statusClass = emp.status === 'active' ? 'status-active' : 'status-inactive';
+                        const statusText = emp.status === 'active' ? '在职' : '离职';
+                        
+                        html += `
+                            <tr>
+                                <td>${emp.id}</td>
+                                <td>${emp.name}</td>
+                                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                                <td>${emp.create_date}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" onclick="showEditEmployeeModal(${emp.id}, '${emp.name}', '${emp.status}')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger" onclick="deleteEmployee(${emp.id}, '${emp.name}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    // 先销毁已存在的 DataTable
+                    if ($.fn.DataTable.isDataTable('#employeesTable')) {
+                        $('#employeesTable').DataTable().destroy();
+                    }
+
+                    $('#employeesTable tbody').html(html);
+
+                    // 重新初始化 DataTable
+                    currentTable = $('#employeesTable').DataTable({
+                        language: {
+                            url: 'https://cdn.datatables.net/plug-ins/1.10.21/i18n/Chinese.json',
+                            paginate: {
+                                first: "首页",
+                                previous: "上一页",
+                                next: "下一页",
+                                last: "末页"
+                            }
+                        },
+                        pageLength: 10,
+                        order: [[0, 'desc']]
+                    });
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('加载员工数据失败', error);
+                showMessage('加载员工数据失败', 'error');
+            }
+        }
+        
+        function showAddEmployeeModal() {
+            $('#addEmployeeModal').modal('show');
+        }
+        
+        async function addEmployee() {
+            const name = $('#addEmployeeName').val().trim();
+            if (!name) {
+                showMessage('请输入员工姓名', 'warning');
+                return;
+            }
+            
+            const result = await callAPI('add_employee', name);
+            if (result.success) {
+                $('#addEmployeeModal').modal('hide');
+                $('#addEmployeeName').val('');
+                showMessage(result.message, 'success');
+                loadEmployees();
+            } else {
+                showMessage(result.message, 'error');
+            }
+        }
+        
+        function showEditEmployeeModal(id, name, status) {
+            $('#editEmployeeId').val(id);
+            $('#editEmployeeName').val(name);
+            $('#editEmployeeStatus').val(status);
+            $('#editEmployeeModal').modal('show');
+        }
+        
+        async function updateEmployee() {
+            const id = $('#editEmployeeId').val();
+            const name = $('#editEmployeeName').val().trim();
+            const status = $('#editEmployeeStatus').val();
+            
+            if (!name) {
+                showMessage('请输入员工姓名', 'warning');
+                return;
+            }
+            
+            const result = await callAPI('update_employee', parseInt(id), name, status);
+            if (result.success) {
+                $('#editEmployeeModal').modal('hide');
+                showMessage(result.message, 'success');
+                loadEmployees();
+            } else {
+                showMessage(result.message, 'error');
+            }
+        }
+        
+        async function deleteEmployee(id, name) {
+            if (!confirm(`确定要删除员工"${name}"吗？`)) {
+                return;
+            }
+            
+            const result = await callAPI('delete_employee', id);
+            if (result.success) {
+                showMessage(result.message, 'success');
+                loadEmployees();
+            } else {
+                showMessage(result.message, 'error');
+            }
+        }
+        
+        // ==================== 花型管理页面 ====================
+        
+        async function loadPatterns() {
+            try {
+                showLoading('#patternsTable tbody');
+                const result = await callAPI('get_patterns');
+                
+                if (result.success) {
+                    const patterns = result.data;
+                    let html = '';
+                    
+                    patterns.forEach(pattern => {
+                        html += `
+                            <tr>
+                                <td>${pattern.id}</td>
+                                <td>${pattern.name}</td>
+                                <td>¥${pattern.price.toFixed(2)}</td>
+                                <td>${pattern.create_date}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" onclick="showEditPatternModal(${pattern.id}, '${pattern.name}', ${pattern.price})">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger" onclick="deletePattern(${pattern.id}, '${pattern.name}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    // 先销毁已存在的 DataTable
+                    if ($.fn.DataTable.isDataTable('#patternsTable')) {
+                        $('#patternsTable').DataTable().destroy();
+                    }
+
+                    $('#patternsTable tbody').html(html);
+
+                    // 重新初始化 DataTable
+                    currentTable = $('#patternsTable').DataTable({
+                        language: {
+                            url: 'https://cdn.datatables.net/plug-ins/1.10.21/i18n/Chinese.json',
+                            paginate: {
+                                first: "首页",
+                                previous: "上一页",
+                                next: "下一页",
+                                last: "末页"
+                            }
+                        },
+                        pageLength: 10,
+                        order: [[0, 'desc']]
+                    });
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('加载花型数据失败', error);
+                showMessage('加载花型数据失败', 'error');
+            }
+        }
+        
+        function showAddPatternModal() {
+            $('#addPatternModal').modal('show');
+        }
+        
+        async function addPattern() {
+            const name = $('#addPatternName').val().trim();
+            const price = parseFloat($('#addPatternPrice').val());
+            
+            if (!name) {
+                showMessage('请输入花型名称', 'warning');
+                return;
+            }
+            
+            if (isNaN(price) || price <= 0) {
+                showMessage('请输入有效的价格', 'warning');
+                return;
+            }
+            
+            const result = await callAPI('add_pattern', name, price);
+            if (result.success) {
+                $('#addPatternModal').modal('hide');
+                $('#addPatternName').val('');
+                $('#addPatternPrice').val('');
+                showMessage(result.message, 'success');
+                loadPatterns();
+            } else {
+                showMessage(result.message, 'error');
+            }
+        }
+        
+        function showEditPatternModal(id, name, price) {
+            $('#editPatternId').val(id);
+            $('#editPatternName').val(name);
+            $('#editPatternPrice').val(price);
+            $('#editPatternModal').modal('show');
+        }
+        
+        async function updatePattern() {
+            const id = $('#editPatternId').val();
+            const name = $('#editPatternName').val().trim();
+            const price = parseFloat($('#editPatternPrice').val());
+            
+            if (!name) {
+                showMessage('请输入花型名称', 'warning');
+                return;
+            }
+            
+            if (isNaN(price) || price <= 0) {
+                showMessage('请输入有效的价格', 'warning');
+                return;
+            }
+            
+            const result = await callAPI('update_pattern', parseInt(id), name, price);
+            if (result.success) {
+                $('#editPatternModal').modal('hide');
+                showMessage(result.message, 'success');
+                loadPatterns();
+            } else {
+                showMessage(result.message, 'error');
+            }
+        }
+        
+        async function deletePattern(id, name) {
+            if (!confirm(`确定要删除花型"${name}"吗？`)) {
+                return;
+            }
+            
+            const result = await callAPI('delete_pattern', id);
+            if (result.success) {
+                showMessage(result.message, 'success');
+                loadPatterns();
+            } else {
+                showMessage(result.message, 'error');
+            }
+        }
+        
+        // ==================== 工资记录页面 ====================
+        
+        async function loadRecords() {
+            try {
+                // 加载员工和花型选项
+                await loadFilterOptions();
+                
+                showLoading('#recordsTable tbody');
+                const result = await callAPI('get_records');
+                
+                if (result.success) {
+                    displayRecords(result.data);
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('加载工资记录失败', error);
+                showMessage('加载工资记录失败', 'error');
+            }
+        }
+        
+        async function loadFilterOptions() {
+            try {
+                const [employeesRes, patternsRes] = await Promise.all([
+                    callAPI('get_employees'),
+                    callAPI('get_patterns')
+                ]);
+                
+                if (employeesRes.success) {
+                    let employeeOptions = '<option value="">全部员工</option>';
+                    employeesRes.data.forEach(emp => {
+                        employeeOptions += `<option value="${emp.id}">${emp.name}</option>`;
+                    });
+                    $('#filterEmployee').html(employeeOptions);
+                }
+                
+                if (patternsRes.success) {
+                    let patternOptions = '<option value="">全部花型</option>';
+                    patternsRes.data.forEach(pattern => {
+                        patternOptions += `<option value="${pattern.id}">${pattern.name}</option>`;
+                    });
+                    $('#filterPattern').html(patternOptions);
+                }
+            } catch (error) {
+                console.error('加载筛选选项失败', error);
+            }
+        }
+        
+        function displayRecords(records) {
+            let html = '';
+            
+            records.forEach(record => {
+                html += `
+                    <tr>
+                        <td>${record.id}</td>
+                        <td>${record.employee_name}</td>
+                        <td>${record.pattern_name}</td>
+                        <td>${record.record_date}</td>
+                        <td>${record.count}</td>
+                        <td>¥${record.total.toFixed(2)}</td>
+                        <td>${record.special || '-'}</td>
+                        <td>${record.note || '-'}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary" onclick="showEditRecordModal(${record.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="deleteRecord(${record.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            // 先销毁已存在的 DataTable
+            if ($.fn.DataTable.isDataTable('#recordsTable')) {
+                $('#recordsTable').DataTable().destroy();
+            }
+
+            $('#recordsTable tbody').html(html);
+
+            // 重新初始化 DataTable
+            currentTable = $('#recordsTable').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.10.21/i18n/Chinese.json',
+                    paginate: {
+                        first: "首页",
+                        previous: "上一页",
+                        next: "下一页",
+                        last: "末页"
+                    }
+                },
+                pageLength: 20,
+                order: [[0, 'desc']]
+            });
+        }
+        
+        async function filterRecords() {
+            const employeeId = $('#filterEmployee').val();
+            const patternId = $('#filterPattern').val();
+            const startDate = $('#filterStartDate').val();
+            const endDate = $('#filterEndDate').val();
+            
+            try {
+                showLoading('#recordsTable tbody');
+                const result = await callAPI('get_records', 
+                    employeeId ? parseInt(employeeId) : null,
+                    patternId ? parseInt(patternId) : null,
+                    startDate || null,
+                    endDate || null
+                );
+                
+                if (result.success) {
+                    displayRecords(result.data);
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('筛选记录失败', error);
+                showMessage('筛选记录失败', 'error');
+            }
+        }
+        
+        function showAddRecordModal() {
+            loadRecordModalOptions();
+            $('#addRecordModal').modal('show');
+        }
+        
+        async function loadRecordModalOptions() {
+            try {
+                const [employeesRes, patternsRes] = await Promise.all([
+                    callAPI('get_employees'),
+                    callAPI('get_patterns')
+                ]);
+                
+                if (employeesRes.success) {
+                    let employeeOptions = '<option value="">请选择员工</option>';
+                    employeesRes.data.forEach(emp => {
+                        employeeOptions += `<option value="${emp.id}">${emp.name}</option>`;
+                    });
+                    $('#addRecordEmployee').html(employeeOptions);
+                }
+                
+                if (patternsRes.success) {
+                    let patternOptions = '<option value="">请选择花型</option>';
+                    patternsRes.data.forEach(pattern => {
+                        patternOptions += `<option value="${pattern.id}">${pattern.name} (¥${pattern.price})</option>`;
+                    });
+                    $('#addRecordPattern').html(patternOptions);
+                }
+                
+                // 设置今日日期
+                const today = new Date().toISOString().split('T')[0];
+                $('#addRecordDate').val(today);
+            } catch (error) {
+                console.error('加载选项失败', error);
+            }
+        }
+        
+        async function addRecord() {
+            const employeeId = $('#addRecordEmployee').val();
+            const patternId = $('#addRecordPattern').val();
+            const recordDate = $('#addRecordDate').val();
+            const count = parseInt($('#addRecordCount').val());
+            const special = $('#addRecordSpecial').val().trim();
+            const note = $('#addRecordNote').val().trim();
+            
+            if (!employeeId) {
+                showMessage('请选择员工', 'warning');
+                return;
+            }
+            
+            if (!patternId) {
+                showMessage('请选择花型', 'warning');
+                return;
+            }
+            
+            if (!recordDate) {
+                showMessage('请选择记录日期', 'warning');
+                return;
+            }
+            
+            if (isNaN(count) || count <= 0) {
+                showMessage('请输入有效的针数', 'warning');
+                return;
+            }
+            
+            const result = await callAPI('add_record', 
+                parseInt(employeeId), 
+                parseInt(patternId), 
+                recordDate, 
+                count, 
+                special, 
+                note
+            );
+            
+            if (result.success) {
+                $('#addRecordModal').modal('hide');
+                // 清空表单
+                $('#addRecordEmployee').val('');
+                $('#addRecordPattern').val('');
+                $('#addRecordDate').val('');
+                $('#addRecordCount').val('');
+                $('#addRecordSpecial').val('');
+                $('#addRecordNote').val('');
+                showMessage(result.message, 'success');
+                loadRecords();
+            } else {
+                showMessage(result.message, 'error');
+            }
+        }
+        
+        function showEditRecordModal(id) {
+            // 这里需要先获取记录详情，然后填充表单
+            // 简化实现，实际应该调用API获取记录详情
+            $('#editRecordModal').modal('show');
+        }
+        
+        async function deleteRecord(id) {
+            if (!confirm('确定要删除这条记录吗？')) {
+                return;
+            }
+            
+            const result = await callAPI('delete_record', id);
+            if (result.success) {
+                showMessage(result.message, 'success');
+                loadRecords();
+            } else {
+                showMessage(result.message, 'error');
+            }
+        }
+        
+        function showImportModal() {
+            $('#importModal').modal('show');
+        }
+        
+        async function importExcel() {
+            const fileInput = document.getElementById('importFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showMessage('请选择要导入的Excel文件', 'warning');
+                return;
+            }
+            
+            try {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const base64 = btoa(String.fromCharCode(...new Uint8Array(e.target.result)));
+                    const result = await callAPI('import_excel_data', base64);
+                    
+                    if (result.success) {
+                        $('#importModal').modal('hide');
+                        fileInput.value = '';
+                        showMessage(result.message, 'success');
+                        if (result.error_records && result.error_records.length > 0) {
+                            console.log('导入错误记录:', result.error_records);
+                        }
+                        loadRecords();
+                    } else {
+                        showMessage(result.message, 'error');
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } catch (error) {
+                console.error('导入失败', error);
+                showMessage('导入失败', 'error');
+            }
+        }
+        
+        // ==================== 统计报表页面 ====================
+        
+        async function loadReports() {
+            // 报表页面初始化
+            const today = new Date().toISOString().split('T')[0];
+            $('#dailyReportDate').val(today);
+        }
+        
+        async function generateDailyReport() {
+            const date = $('#dailyReportDate').val();
+            if (!date) {
+                showMessage('请选择日期', 'warning');
+                return;
+            }
+            
+            try {
+                showLoading('#dailyReportContent');
+                const result = await callAPI('get_daily_summary', date);
+                
+                if (result.success) {
+                    displayDailyReport(result.data, date);
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('生成日报失败', error);
+                showMessage('生成日报失败', 'error');
+            }
+        }
+        
+        function displayDailyReport(data, date) {
+            let html = '<div class="table-responsive"><table class="table table-striped">';
+            html += '<thead><tr><th>员工</th><th>花型</th><th>针数</th><th>工资</th></tr></thead><tbody>';
+            
+            let totalWage = 0;
+            data.forEach(record => {
+                html += `
+                    <tr>
+                        <td>${record.employee_name}</td>
+                        <td>${record.pattern_name}</td>
+                        <td>${record.count}</td>
+                        <td>¥${record.total.toFixed(2)}</td>
+                    </tr>
+                `;
+                totalWage += record.total;
+            });
+            
+            html += '</tbody></table></div>';
+            html += `<div class="alert alert-info">${date} 总工资: ¥${totalWage.toFixed(2)}</div>`;
+            
+            $('#dailyReportContent').html(html);
+        }
+        
+        async function generateMonthlyReport() {
+            const year = $('#monthlyReportYear').val();
+            const month = $('#monthlyReportMonth').val();
+            
+            try {
+                showLoading('#monthlyReportContent');
+                const result = await callAPI('get_monthly_summary', parseInt(year), parseInt(month));
+                
+                if (result.success) {
+                    displayMonthlyReport(result.data, year, month);
+                    $('#exportBtn').prop('disabled', false);
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('生成月报失败', error);
+                showMessage('生成月报失败', 'error');
+            }
+        }
+        
+        function displayMonthlyReport(data, year, month) {
+            let html = '<div class="table-responsive"><table class="table table-striped">';
+            html += '<thead><tr><th>员工</th>';
+            
+            // 动态添加花型列
+            const patterns = [...new Set(data.map(item => item.pattern_name))];
+            patterns.forEach(pattern => {
+                html += `<th>${pattern}</th>`;
+            });
+            html += '<th>合计</th></tr></thead><tbody>';
+            
+            // 按员工分组显示数据
+            const employees = [...new Set(data.map(item => item.employee_name))];
+            employees.forEach(employee => {
+                html += `<tr><td>${employee}</td>`;
+                
+                let employeeTotal = 0;
+                patterns.forEach(pattern => {
+                    const records = data.filter(item => 
+                        item.employee_name === employee && item.pattern_name === pattern
+                    );
+                    const count = records.reduce((sum, record) => sum + record.count, 0);
+                    const wage = records.reduce((sum, record) => sum + record.total, 0);
+                    employeeTotal += wage;
+                    
+                    html += `<td>${count}/${wage.toFixed(2)}</td>`;
+                });
+                
+                html += `<td>¥${employeeTotal.toFixed(2)}</td></tr>`;
+            });
+            
+            html += '</tbody></table></div>';
+            
+            $('#monthlyReportContent').html(html);
+        }
+        
+        async function exportMonthlyExcel() {
+            const year = $('#monthlyReportYear').val();
+            const month = $('#monthlyReportMonth').val();
+            
+            try {
+                const result = await callAPI('export_monthly_excel', parseInt(year), parseInt(month));
+                
+                if (result.success) {
+                    // 下载文件
+                    const link = document.createElement('a');
+                    link.href = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' + result.data.content;
+                    link.download = result.data.filename;
+                    link.click();
+                    showMessage('Excel文件导出成功', 'success');
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('导出Excel失败', error);
+                showMessage('导出Excel失败', 'error');
+            }
+        }
+    </script>
+</body>
+</html>
